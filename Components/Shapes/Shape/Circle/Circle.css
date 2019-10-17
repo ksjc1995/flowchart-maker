@@ -1,0 +1,12 @@
+.circle{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.circle:hover{
+    cursor: pointer;
+}

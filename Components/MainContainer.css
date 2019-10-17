@@ -1,0 +1,27 @@
+#mainContainer{
+    display: flex;
+    justify-content: center;
+}
+
+.loadFlowChartButton{
+    display: inline-block;
+    width: 150px;
+    height:50px;
+    background-color: white;
+    border:1px solid teal;
+    color:teal;
+    border-radius: 5px;
+    margin-right:8px;
+    padding:5px;
+}
+
+.loadFlowChartButton:hover{
+    cursor: pointer;
+    background-color: teal;
+    color: white;
+}
+
+.savedChartListHeader{
+    margin:0;
+    margin-bottom: 8px;
+}

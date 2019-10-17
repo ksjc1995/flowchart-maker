@@ -1,0 +1,43 @@
+{
+  "name": "flowchartapp",
+  "version": "0.0.1",
+  "description": "Drag and drop flowchart maker application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "startServer": "webpack-dev-server --config webpack.config.dev.js",
+    "build": "webpack --config webpack.config.dev.js"
+  },
+  "keywords": [
+    "Flowchart",
+    "Drag",
+    "Drop",
+    "Drag",
+    "and",
+    "Drop",
+    "React",
+    "Redux"
+  ],
+  "author": "Kartik Sharma",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.2.0",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.1",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2"
+  }
+}

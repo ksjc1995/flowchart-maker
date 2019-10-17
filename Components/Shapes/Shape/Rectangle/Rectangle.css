@@ -1,0 +1,11 @@
+.rectangle{
+    border-color:#ccc;
+    border-style:solid;
+    width:100px;
+    height:50px;
+    border-width: 1px;
+}
+
+.rectangle:hover{
+    cursor: pointer;
+}

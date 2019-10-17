@@ -1,0 +1,16 @@
+
+.action{
+    width:75px;
+    height:25px;
+    border: 1px solid teal;
+    border-radius:3px;
+    color: teal;
+    background-color: white;
+    margin:10px auto;
+}
+
+.action:hover{
+    cursor: pointer;
+    background-color: teal;
+    color:white;
+}

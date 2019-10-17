@@ -1,0 +1,11 @@
+.actionContainer {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.actionsHeading{
+    margin:0;
+}
