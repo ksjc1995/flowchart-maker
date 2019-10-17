@@ -134,7 +134,6 @@ class MainContainer extends React.Component {
   }
 
   onMouseDown(event){
-    console.log("onMouseDown");
     let shiftX = event.clientX - object.getBoundingClientRect().left;
     let shiftY = event.clientY - object.getBoundingClientRect().top;
 
@@ -190,8 +189,9 @@ class MainContainer extends React.Component {
           />
           <Actions actions={this.actions} />
         </div>
-        <div>
-          <h3 className="savedChartListHeader">Load saved Charts</h3>
+        <h3 className="savedChartListHeader">Load saved Charts</h3>
+        <div className="savedChartList">
+         
           {this.renderSavedFlowChartsList()}
         </div>
       </div>
