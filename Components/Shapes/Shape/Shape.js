@@ -2,38 +2,56 @@ import React from "react";
 import Circle from "@Components/Shapes/Shape/Circle/Circle";
 import Rectangle from "@Components/Shapes/Shape/Rectangle/Rectangle";
 import Triangle from "@Components/Shapes/Shape/Triangle/Triangle";
-
-export default function Shape(props) {
-  const { type, onDrag, onShapeClick, position, id, onMouseDown } = props;
-  let shapeToRender = (
-    <Circle
-      id={id}
-      onShapeClick={onShapeClick}
-      onMouseDown={onMouseDown}
-      position={position}
-      onDrag={onDrag}
-    />
-  );
-  if (type === "rectangle")
-    shapeToRender = (
-      <Rectangle
+import Line from '@Components/Shapes/Shape/Line/Line';
+export default class Shape extends React.Component {
+  render() {
+    const {
+      type,
+      onShapeClick,
+      position,
+      id,
+      onMouseDown,
+      insideWindow
+    } = this.props;
+    let shapeToRender = (
+      <Circle
+        insideWindow={insideWindow}
         id={id}
-        position={position}
-        onMouseDown={onMouseDown}
         onShapeClick={onShapeClick}
-        onDrag={onDrag}
+        onMouseDown={onMouseDown}
+        position={position}
       />
     );
-  else if (type === "triangle")
-    shapeToRender = (
-      <Triangle
-        id={id}
-        position={position}
-        onMouseDown={onMouseDown}
-        onShapeClick={onShapeClick}
-        onDrag={onDrag}
-      />
-    );
-  //   else if (type === "line") shapeToRender = "Line";
-  return shapeToRender;
+    if (type === "rectangle")
+      shapeToRender = (
+        <Rectangle
+          insideWindow={insideWindow}
+          id={id}
+          position={position}
+          onMouseDown={onMouseDown}
+          onShapeClick={onShapeClick}
+        />
+      );
+    else if (type === "triangle")
+      shapeToRender = (
+        <Triangle
+          insideWindow={insideWindow}
+          id={id}
+          position={position}
+          onMouseDown={onMouseDown}
+          onShapeClick={onShapeClick}
+        />
+      );
+    else if (type === "line")
+      shapeToRender = (
+        <Line
+          insideWindow={insideWindow}
+          id={id}
+          position={position}
+          onMouseDown={onMouseDown}
+          onShapeClick={onShapeClick}
+        />
+      );
+    return shapeToRender;
+  }
 }

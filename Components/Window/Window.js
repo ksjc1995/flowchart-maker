@@ -4,30 +4,27 @@ import Shape from "@Components/Shapes/Shape/Shape";
 export default class Window extends React.Component {
   render() {
     const {
-      allowDrop,
-      onDrop,
       flowChartStack,
-      onDrag,
+      windowRef,
       onShapeClick,
       onMouseDown
     } = this.props;
     return (
       <div
         id="windowArea"
-        onDragOver={e => allowDrop(e)}
-        onDrop={e => onDrop(e)}
+        ref = {windowRef}
       >
         {flowChartStack.length > 0 ? (
           flowChartStack.map((shape, index) => {
             return (
               <Shape
+                insideWindow={shape.insideWindow}
                 onMouseDown={onMouseDown}
                 onShapeClick={onShapeClick}
                 id={shape.shapeId}
                 type={shape.name}
-                position={index}
+                position={shape.position}
                 key={shape.name + "" + index}
-                onDrag={onDrag}
               />
             );
           })

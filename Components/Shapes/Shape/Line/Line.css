@@ -1,0 +1,19 @@
+.line{
+    height:70px;
+    width:1px;
+    background-color:#ccc;
+    margin: 10px auto;
+}
+
+.hLine{
+    width:70px;
+    margin:10px auto;
+    background-color:#ccc;
+    height:1px;
+}
+
+.line:hover,.hLine:hover{
+    cursor: pointer;
+}
+
+

@@ -8,7 +8,10 @@ import {
   saveWindow,
   loadFlowChart,
   undoAction,
-  dropComponent
+  dropComponent,
+  updateObjectPosition,
+  updateSavedFlowchartIds,
+  addAttribute
 } from "../Actions/flowChartEditorActions";
 import "./MainContainer.css";
 
@@ -21,27 +24,25 @@ class MainContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onDrag = this.onDrag.bind(this);
-    this.allowDrop = this.allowDrop.bind(this);
-    this.onDrop = this.onDrop.bind(this);
     this.saveClickHandler = this.saveClickHandler.bind(this);
     this.resetClickHandler = this.resetClickHandler.bind(this);
     this.undoClickHandler = this.undoClickHandler.bind(this);
     this.loadClickHandler = this.loadClickHandler.bind(this);
     this.onShapeClick = this.onShapeClick.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    this.onMouseDown = this.onMouseUp.bind(this);
+    this.windowRef = React.createRef();
   }
 
   saveClickHandler() {
     let { flowChartEditorState, saveWindow } = this.props;
+    let localStorageKeyForFlowChart =
+      "flowChart" + flowChartEditorState.flowChartId;
     if (flowChartEditorState.flowChartStack.length > 0) {
       localStorage.setItem(
-        "flowChart" + flowChartEditorState.flowChartId,
+        localStorageKeyForFlowChart,
         JSON.stringify(flowChartEditorState.flowChartStack)
       );
       flowChartEditorState.flowChartId += 1;
-      saveWindow(flowChartEditorState.flowChartId);
+      saveWindow(flowChartEditorState.flowChartId, localStorageKeyForFlowChart);
     } else {
       console.log("Nothing to save!");
     }
@@ -78,27 +79,16 @@ class MainContainer extends React.Component {
     }
   }
 
-  onDrag(e) {
-    const { flowChartEditorState } = this.props;
-    let shapeId =
-      e.target.className + "" + flowChartEditorState.currentComponentId;
-    e.dataTransfer.setData("shapeName", e.target.className);
-    e.dataTransfer.setData("shapeId", shapeId);
-  }
-
-  allowDrop(e) {
-    e.preventDefault();
-  }
-
-  onDrop(e) {
-    e.preventDefault();
-    console.dir(e.target);
+  dropObjectToWindow(shapeId, shapeName, position, isInsideWindowArea) {
     let { flowChartEditorState, dropComponent } = this.props;
-    let shapeId = e.dataTransfer.getData("shapeId");
-    let shapeName = e.dataTransfer.getData("shapeName");
     flowChartEditorState.flowChartStack.push({
       shapeId: shapeId,
-      name: shapeName
+      name: shapeName,
+      position: {
+        x: position.x,
+        y: position.y
+      },
+      insideWindow: isInsideWindowArea
     });
     flowChartEditorState.currentComponentId += 1;
     dropComponent(
@@ -107,16 +97,34 @@ class MainContainer extends React.Component {
     );
   }
 
-  onShapeClick(e, position) {
-    // add attribute
-    console.log("clicked", position);
+  onShapeClick(e) {
+    console.log('clicked');
+    const { addAttribute, flowChartEditorState } = this.props;
+
+    let key = prompt("Add Attribute key: ");
+    let value = prompt("Add attribute value: ");
+
+    let flowChartStack = [...flowChartEditorState.flowChartStack];
+    let objectToBeUpdatedIndex = flowChartStack.findIndex(
+      object => object.shapeId === e.target.id
+    );
+    if (!flowChartStack[objectToBeUpdatedIndex].attributes)
+      flowChartStack[objectToBeUpdatedIndex].attributes = [];
+
+    flowChartStack[objectToBeUpdatedIndex].attributes.push({ [key]: value });
+    addAttribute(flowChartStack);
   }
 
   renderSavedFlowChartsList() {
+    const { savedFlowChartIds, updateSavedFlowchartIds } = this.props;
     let keys = Object.keys(localStorage);
     let list = "";
-    if (keys) {
-      list = keys.map(key => {
+    // on page load update keys from localStorage
+    if (savedFlowChartIds.length == 0 && keys.length > 0) {
+      console.log("here");
+      updateSavedFlowchartIds(keys);
+    } else {
+      list = savedFlowChartIds.map(key => {
         if (key != "loglevel:webpack-dev-server")
           return (
             <button
@@ -133,67 +141,120 @@ class MainContainer extends React.Component {
     return list;
   }
 
-  onMouseDown(event){
-    let shiftX = event.clientX - object.getBoundingClientRect().left;
-    let shiftY = event.clientY - object.getBoundingClientRect().top;
+  updatePositionOfObjectInsideWindowArea = (shapeId, position) => {
+    const { flowChartEditorState, updateObjectPosition } = this.props;
+    let flowChartStack = [...flowChartEditorState.flowChartStack];
+    let objectToBeUpdatedIndex = flowChartStack.findIndex(
+      object => object.shapeId === shapeId
+    );
+    flowChartStack[objectToBeUpdatedIndex].position.x = position.x;
+    flowChartStack[objectToBeUpdatedIndex].position.y = position.y;
 
-    console.log(shiftX);
-    console.log(shiftY);
-    // object.style.position = "absolute";
-    // object.style.zIndex = 1000;
-    // document.body.append(object);
-
-    // moveAt(event.pageX, event.pageY);
-
-    // // moves the object at (pageX, pageY) coordinates
-    // // taking initial shifts into account
-    // function moveAt(pageX, pageY) {
-    //   object.style.left = pageX - shiftX + "px";
-    //   object.style.top = pageY - shiftY + "px";
-    // }
-
-    // function onMouseMove(event) {
-    //   moveAt(event.pageX, event.pageY);
-    // }
-
-    // // move the object on mousemove
-    // document.addEventListener("mousemove", onMouseMove);
-
-    // // drop the object, remove unneeded handlers
-    // object.onmouseup = function() {
-    //   document.removeEventListener("mousemove", onMouseMove);
-    //   object.onmouseup = null;
-    // };
+    updateObjectPosition(flowChartStack);
   };
 
-  onMouseUp() {}
+  componentDidMount(){
+    console.log("cdm");
+  }
 
+  componentWillUnmount(){
+    console.log('cwu');
+  }
+
+  componentDidUpdate(){
+    console.log('cdu');
+  }
+
+  handleMouseDown = (event, isObjectInsideWindowArea) => {
+
+    const { flowChartEditorState } = this.props;
+
+    let object = event.target;
+    let shiftX = event.clientX - event.target.getBoundingClientRect().left;
+    let shiftY = event.clientY - event.target.getBoundingClientRect().top;
+
+    let windowX = this.windowRef.current.getBoundingClientRect().x;
+    let windowY = this.windowRef.current.getBoundingClientRect().y;
+
+    if (!isObjectInsideWindowArea) {
+      object = event.target.cloneNode(true);
+      object.style.position = "absolute";
+      object.style.zIndex = 1000;
+    }
+
+    document.body.append(object);
+    moveAt(event.pageX, event.pageY);
+
+    // moves the object at (pageX, pageY) coordinates
+    // taking initial shifts into account
+    function moveAt(pageX, pageY) {
+      object.style.left = pageX - shiftX + "px";
+      object.style.top = pageY - shiftY + "px";
+    }
+
+    function onMouseMove(event) {
+      moveAt(event.pageX, event.pageY);
+    }
+
+    // move the object on mousemove
+    document.addEventListener("mousemove", onMouseMove);
+
+    // drop the object, remove unneeded handlers
+    object.onmouseup = event => {
+      // find object position
+      let objectX = event.clientX - event.offsetX;
+      let objectY = event.clientY - event.offsetY;
+      //check if object is inside windowArea
+      if (
+        objectX - windowX > 0 &&
+        objectY - windowY > 0 &&
+        objectX + 100 < this.windowRef.current.offsetLeft + 502
+      ) {
+        let shapeId =
+          event.target.id + "" + flowChartEditorState.currentComponentId;
+        if (!isObjectInsideWindowArea) {
+          this.dropObjectToWindow(
+            shapeId,
+            event.target.className,
+            {
+              x: objectX - windowX - 2,
+              y: objectY - windowY - 12
+            },
+            true
+          );
+        } else {
+          this.updatePositionOfObjectInsideWindowArea(event.target.id, {
+            x: objectX - windowX - 2,
+            y: objectY - windowY - 12
+          });
+        }
+      }
+      this.windowRef.current.append(object);
+      // remove clone and listeners
+      if (!isObjectInsideWindowArea) {
+        object.remove();
+      }
+
+      object.onmouseup = null;
+      document.removeEventListener("mousemove", onMouseMove);
+    };
+  };
   render() {
     const { flowChartEditorState, shapes } = this.props;
     return (
       <div>
         <div id="mainContainer">
-          <ShapesContainer
-            shapes={shapes}
-            onDrag={this.onDrag}
-            allowDrop={this.allowDrop}
-            onDrop={this.onDrop}
-          />
+          <ShapesContainer shapes={shapes} onMouseDown={this.handleMouseDown} />
           <Window
             flowChartStack={flowChartEditorState.flowChartStack}
-            onDrag={this.onDrag}
-            allowDrop={this.allowDrop}
-            onDrop={this.onDrop}
             onShapeClick={this.onShapeClick}
-            onMouseDown={this.onMouseDown}
+            onMouseDown={this.handleMouseDown}
+            windowRef={this.windowRef}
           />
           <Actions actions={this.actions} />
         </div>
         <h3 className="savedChartListHeader">Load saved Charts</h3>
-        <div className="savedChartList">
-         
-          {this.renderSavedFlowChartsList()}
-        </div>
+        <div className="savedChartList">{this.renderSavedFlowChartsList()}</div>
       </div>
     );
   }
@@ -206,5 +267,14 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { resetWindow, saveWindow, loadFlowChart, undoAction, dropComponent }
+  {
+    resetWindow,
+    saveWindow,
+    loadFlowChart,
+    undoAction,
+    dropComponent,
+    updateObjectPosition,
+    updateSavedFlowchartIds,
+    addAttribute
+  }
 )(MainContainer);

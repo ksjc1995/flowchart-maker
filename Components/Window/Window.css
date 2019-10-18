@@ -1,9 +1,9 @@
 #windowArea {
     overflow: auto;
-    width: 500px;
     height: 500px;
     border: 1px solid teal;
     position: relative;
+    min-width: 500px;
 }
 
 .defaultText{
